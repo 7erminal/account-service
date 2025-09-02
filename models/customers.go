@@ -16,7 +16,7 @@ type Customers struct {
 	Branch               *Branches            `orm:"column(branch);rel(fk)"`
 	CreatedBy            int                  `orm:"column(created_by);null"`
 	CustomerCategoryId   *CustomerCategories  `orm:"column(customer_category_id);rel(fk)"`
-	Id                   int                  `orm:"column(customer_id);auto"`
+	Id                   int64                `orm:"column(customer_id);auto"`
 	CustomerNumber       string               `orm:"column(customer_number);size(255);null"`
 	DateCreated          time.Time            `orm:"column(date_created);type(datetime);null;auto_now_add"`
 	DateModified         time.Time            `orm:"column(date_modified);type(datetime);null"`
@@ -53,7 +53,7 @@ func AddCustomers(m *Customers) (id int64, err error) {
 
 // GetCustomersById retrieves Customers by Id. Returns error if
 // Id doesn't exist
-func GetCustomersById(id int) (v *Customers, err error) {
+func GetCustomersById(id int64) (v *Customers, err error) {
 	o := orm.NewOrm()
 	v = &Customers{Id: id}
 	if err = o.Read(v); err == nil {
@@ -157,7 +157,7 @@ func UpdateCustomersById(m *Customers) (err error) {
 
 // DeleteCustomers deletes Customers by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteCustomers(id int) (err error) {
+func DeleteCustomers(id int64) (err error) {
 	o := orm.NewOrm()
 	v := Customers{Id: id}
 	// ascertain id exists in the database

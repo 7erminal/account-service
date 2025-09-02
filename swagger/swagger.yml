@@ -1,0 +1,448 @@
+swagger: "2.0"
+info:
+  title: beego Test API
+  description: |
+    beego has a very cool tools to autogenerate documents for your API
+  version: 1.0.0
+  termsOfService: http://beego.me/
+  contact:
+    email: astaxie@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+basePath: /v1
+paths:
+  /customer-accounts/{id}:
+    delete:
+      tags:
+      - customer-accounts
+      description: |-
+        delete the Customer_accounts
+        <br>
+      operationId: Customer_accountsController.Delete
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          description: '{string} delete success!'
+        "403":
+          description: id is empty
+  /customer-accounts/account/{accountNumber}:
+    get:
+      tags:
+      - customer-accounts
+      description: |-
+        get Customer_accounts by account number
+        <br>
+      operationId: Customer_accountsController.Get Account with Account Number
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Customer_accounts'
+        "403":
+          description: :id is empty
+  /customer-accounts/add-account:
+    post:
+      tags:
+      - customer-accounts
+      description: |-
+        create Customer_accounts
+        <br>
+      operationId: Customer_accountsController.Add CustomerAccount
+      parameters:
+      - in: body
+        name: body
+        description: body for Customer_accounts content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateCustomerAccountRequest'
+      responses:
+        "201":
+          description: '{int} models.Customer_accounts'
+        "403":
+          description: body is empty
+  /customer-accounts/credit-account/{id}:
+    put:
+      tags:
+      - customer-accounts
+      description: |-
+        update the Customer_accounts
+        <br>
+      operationId: Customer_accountsController.CreditAccount
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Customer_accounts content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreditAccountRequest'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Customer_accounts'
+        "403":
+          description: :id is not int
+  /customer-accounts/customer/{id}:
+    get:
+      tags:
+      - customer-accounts
+      description: |-
+        get Customer_accounts by account number
+        <br>
+      operationId: Customer_accountsController.Get Account with Customer Id
+      parameters:
+      - in: path
+        name: id
+        description: The key for staticblock
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Customer_accounts'
+        "403":
+          description: :id is empty
+  /customer-accounts/debit-account/{id}:
+    put:
+      tags:
+      - customer-accounts
+      description: |-
+        update the Customer_accounts
+        <br>
+      operationId: Customer_accountsController.DebitAccount
+      parameters:
+      - in: path
+        name: id
+        description: The id you want to update
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: body for Customer_accounts content
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DebitAccountRequest'
+      responses:
+        "200":
+          description: ""
+          schema:
+            $ref: '#/definitions/models.Customer_accounts'
+        "403":
+          description: :id is not int
+definitions:
+  models.Accounts:
+    title: Accounts
+    type: object
+    properties:
+      AccountName:
+        type: string
+      AccountNo:
+        type: integer
+        format: int64
+      Branchid:
+        $ref: '#/definitions/models.Corporateinfo'
+      Corpid:
+        $ref: '#/definitions/models.Corporateinfo'
+      DateTime:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      Mobile:
+        type: string
+  models.ApplicationProperties:
+    title: ApplicationProperties
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+      PropertyCode:
+        type: string
+      PropertyValue:
+        type: string
+  models.Branches:
+    title: Branches
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      Branch:
+        type: string
+      BranchManager:
+        type: integer
+        format: int64
+      CountryId:
+        type: integer
+        format: int64
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      Location:
+        type: string
+      ModifiedBy:
+        type: integer
+        format: int64
+      PhoneNumber:
+        type: string
+  models.Corporateinfo:
+    title: Corporateinfo
+    type: object
+    properties:
+      Branchid:
+        type: integer
+        format: int64
+      Corpaddress:
+        type: string
+      Corpid:
+        type: integer
+        format: int64
+      Corpname:
+        type: string
+      CreatedAt:
+        type: string
+        format: datetime
+      Email:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      Logo:
+        type: string
+      Phone:
+        type: string
+      UpdatedAt:
+        type: string
+        format: datetime
+  models.Customer_accounts:
+    title: Customer_accounts
+    type: object
+    properties:
+      AccountAlias:
+        type: string
+      AccountNumber:
+        type: string
+      Active:
+        type: integer
+        format: int64
+      Balance:
+        type: number
+        format: double
+      BalanceBefore:
+        type: number
+        format: double
+      CreatedBy:
+        type: integer
+        format: int64
+      Customer:
+        $ref: '#/definitions/models.Customers'
+      CustomerAccountId:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      FrozenAmount:
+        type: number
+        format: double
+      ModifiedBy:
+        type: integer
+        format: int64
+  models.CustomerCategories:
+    title: CustomerCategories
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      Category:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Description:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+  models.Customers:
+    title: Customers
+    type: object
+    properties:
+      Accountid:
+        $ref: '#/definitions/models.Accounts'
+      Active:
+        type: integer
+        format: int64
+      Branch:
+        $ref: '#/definitions/models.Branches'
+      CreatedBy:
+        type: integer
+        format: int64
+      CustomerCategoryId:
+        $ref: '#/definitions/models.CustomerCategories'
+      CustomerNumber:
+        type: string
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Dob:
+        type: string
+      Email:
+        type: string
+      FullName:
+        type: string
+      Id:
+        type: integer
+        format: int64
+      IdentificationNumber:
+        type: string
+      IdentificationTypeId:
+        $ref: '#/definitions/models.IdentificationTypes'
+      ImagePath:
+        type: string
+      LastTxnDate:
+        type: string
+        format: datetime
+      Location:
+        type: string
+      ModifiedBy:
+        type: integer
+        format: int64
+      Nickname:
+        type: string
+      PhoneNumber:
+        type: string
+      ShopId:
+        type: integer
+        format: int64
+      UserId:
+        type: integer
+        format: int64
+  models.IdentificationTypes:
+    title: IdentificationTypes
+    type: object
+    properties:
+      Active:
+        type: integer
+        format: int64
+      Code:
+        type: string
+      CreatedBy:
+        type: integer
+        format: int64
+      DateCreated:
+        type: string
+        format: datetime
+      DateModified:
+        type: string
+        format: datetime
+      Id:
+        type: integer
+        format: int64
+      ModifiedBy:
+        type: integer
+        format: int64
+      Name:
+        type: string
+  requests.CreateCustomerAccountRequest:
+    title: CreateCustomerAccountRequest
+    type: object
+    properties:
+      account_alias:
+        type: string
+      account_number:
+        type: string
+      active:
+        type: integer
+        format: int64
+      created_by:
+        type: integer
+        format: int64
+  requests.CreditAccountRequest:
+    title: CreditAccountRequest
+    type: object
+    properties:
+      amount:
+        type: number
+        format: double
+      modified_by:
+        type: integer
+        format: int64
+      reason:
+        type: string
+  requests.DebitAccountRequest:
+    title: DebitAccountRequest
+    type: object
+    properties:
+      amount:
+        type: number
+        format: double
+      modified_by:
+        type: integer
+        format: int64
+      reason:
+        type: string
+tags:
+- name: customer-accounts
+  description: |
+    Customer_accountsController operations for Customer_accounts
