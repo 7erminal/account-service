@@ -21,3 +21,9 @@ type CustomerAccountResponse struct {
 	StatusMessage string                      `json:"statusMessage"`
 	Result        *CustomerAccountResponseObj `json:"result,omitempty"`
 }
+
+type CustomerAccountsResponse struct {
+	StatusCode    string                        `json:"statusCode"`
+	StatusMessage string                        `json:"statusMessage"`
+	Result        []*CustomerAccountResponseObj `json:"result,omitempty"`
+}

@@ -11,9 +11,10 @@ import (
 )
 
 type Customer_accounts struct {
-	CustomerAccountId int64  `orm:"auto"`
-	AccountNumber     string `orm:"size(100)"`
-	AccountAlias      string `orm:"size(255)"`
+	CustomerAccountId int64      `orm:"auto"`
+	Customer          *Customers `orm:"rel(fk)"`
+	AccountNumber     string     `orm:"size(100)"`
+	AccountAlias      string     `orm:"size(255)"`
 	Balance           float64
 	FrozenAmount      float64
 	BalanceBefore     float64
@@ -42,6 +43,17 @@ func GetCustomer_accountsById(id int64) (v *Customer_accounts, err error) {
 	o := orm.NewOrm()
 	v = &Customer_accounts{CustomerAccountId: id}
 	if err = o.QueryTable(new(Customer_accounts)).Filter("CustomerAccountId", id).RelatedSel().One(v); err == nil {
+		return v, nil
+	}
+	return nil, err
+}
+
+// GetCustomer_accountsByAccountNumber retrieves Customer_accounts by account number. Returns error if
+// Id doesn't exist
+func GetCustomer_accountsByAccountNumber(accountNumber string) (v *Customer_accounts, err error) {
+	o := orm.NewOrm()
+	v = &Customer_accounts{AccountNumber: accountNumber}
+	if err = o.QueryTable(new(Customer_accounts)).Filter("AccountNumber", accountNumber).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err

@@ -22,12 +22,11 @@ type Customer_accountsController struct {
 // URLMapping ...
 func (c *Customer_accountsController) URLMapping() {
 	c.Mapping("AddCustomerAccount", c.AddCustomerAccount)
-	c.Mapping("GetOne", c.GetOne)
-	c.Mapping("GetAll", c.GetAll)
-	c.Mapping("Put", c.Put)
-	c.Mapping("Delete", c.Delete)
 	c.Mapping("DebitAccount", c.DebitAccount)
 	c.Mapping("CreditAccount", c.CreditAccount)
+	c.Mapping("GetAccountByAccountNumber", c.GetAccountByAccountNumber)
+	c.Mapping("GetAccountByCustomerId", c.GetAccountsByCustomerId)
+	c.Mapping("Delete", c.Delete)
 }
 
 // AddCustomerAccount ...
@@ -44,9 +43,9 @@ func (c *Customer_accountsController) AddCustomerAccount() {
 	customer := models.Customer_accounts{
 		AccountNumber: v.AccountNumber,
 		AccountAlias:  v.AccountAlias,
-		Balance:       v.Balance,
+		Balance:       0,
 		FrozenAmount:  0,
-		BalanceBefore: v.Balance,
+		BalanceBefore: 0,
 		DateCreated:   time.Now(),
 		DateModified:  time.Now(),
 		CreatedBy:     v.CreatedBy,
@@ -233,38 +232,64 @@ func (c *Customer_accountsController) CreditAccount() {
 	c.ServeJSON()
 }
 
-// GetOne ...
-// @Title Get One
-// @Description get Customer_accounts by id
+// GetAccountByAccountNumber ...
+// @Title Get Account with Account Number
+// @Description get Customer_accounts by account number
 // @Param	id		path 	string	true		"The key for staticblock"
 // @Success 200 {object} models.Customer_accounts
 // @Failure 403 :id is empty
-// @router /:id [get]
-func (c *Customer_accountsController) GetOne() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v, err := models.GetCustomer_accountsById(id)
+// @router /account/:accountNumber [get]
+func (c *Customer_accountsController) GetAccountByAccountNumber() {
+	accountNumberStr := c.Ctx.Input.Param(":accountNumber")
+	v, err := models.GetCustomer_accountsByAccountNumber(accountNumberStr)
+
+	statusCode := "500"
+	statusDesc := "Error crediting account"
+	result := responses.CustomerAccountResponseObj{}
+
 	if err != nil {
-		c.Data["json"] = err.Error()
+		logs.Error("Error fetching customer account: ", err)
+		statusCode = "500"
+		statusDesc = "Error fetching customer account: " + err.Error()
+
 	} else {
-		c.Data["json"] = v
+		result = responses.CustomerAccountResponseObj{
+			CustomerAccountId: v.CustomerAccountId,
+			AccountNumber:     v.AccountNumber,
+			AccountAlias:      v.AccountAlias,
+			Balance:           v.Balance,
+			FrozenAmount:      v.FrozenAmount,
+			BalanceBefore:     v.BalanceBefore,
+			DateCreated:       v.DateCreated.Format("2006-01-02 15:04:05"),
+			Active:            v.Active,
+		}
+		statusCode = "200"
+		statusDesc = "Customer account fetched successfully"
 	}
+
+	resp := responses.CustomerAccountResponse{
+		StatusCode:    statusCode,
+		StatusMessage: statusDesc,
+		Result:        &result,
+	}
+	c.Data["json"] = resp
 	c.ServeJSON()
 }
 
-// GetAll ...
-// @Title Get All
-// @Description get Customer_accounts
-// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
-// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
-// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
-// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
-// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
-// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
+// GetAccountsByCustomerId ...
+// @Title Get Account with Customer Id
+// @Description get Customer_accounts by account number
+// @Param	id		path 	string	true		"The key for staticblock"
 // @Success 200 {object} models.Customer_accounts
-// @Failure 403
-// @router / [get]
-func (c *Customer_accountsController) GetAll() {
+// @Failure 403 :id is empty
+// @router /customer/:id [get]
+func (c *Customer_accountsController) GetAccountsByCustomerId() {
+	customerId := c.Ctx.Input.Param(":id")
+
+	statusCode := "500"
+	statusDesc := "Error crediting account"
+	result := []*responses.CustomerAccountResponseObj{}
+
 	var fields []string
 	var sortby []string
 	var order []string
@@ -272,28 +297,9 @@ func (c *Customer_accountsController) GetAll() {
 	var limit int64 = 10
 	var offset int64
 
-	// fields: col1,col2,entity.col3
-	if v := c.GetString("fields"); v != "" {
-		fields = strings.Split(v, ",")
-	}
-	// limit: 10 (default is 10)
-	if v, err := c.GetInt64("limit"); err == nil {
-		limit = v
-	}
-	// offset: 0 (default is 0)
-	if v, err := c.GetInt64("offset"); err == nil {
-		offset = v
-	}
-	// sortby: col1,col2
-	if v := c.GetString("sortby"); v != "" {
-		sortby = strings.Split(v, ",")
-	}
-	// order: desc,asc
-	if v := c.GetString("order"); v != "" {
-		order = strings.Split(v, ",")
-	}
-	// query: k:v,k:v
-	if v := c.GetString("query"); v != "" {
+	customerSearch := "CustomerAccountId__CustomerId:" + customerId
+
+	if v := customerSearch; v != "" {
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.SplitN(cond, ":", 2)
 			if len(kv) != 2 {
@@ -306,34 +312,41 @@ func (c *Customer_accountsController) GetAll() {
 		}
 	}
 
-	l, err := models.GetAllCustomer_accounts(query, fields, sortby, order, offset, limit)
-	if err != nil {
-		c.Data["json"] = err.Error()
+	if custAccounts, err := models.GetAllCustomer_accounts(query, fields, sortby, order, offset, limit); err != nil {
+		logs.Error("Error fetching customer account: ", err)
+		statusCode = "500"
+		statusDesc = "Error fetching customer accounts: " + err.Error()
 	} else {
-		c.Data["json"] = l
+		if len(custAccounts) > 0 {
+			for _, v := range custAccounts {
+				custAccount := v.(models.Customer_accounts)
+				account := responses.CustomerAccountResponseObj{
+					CustomerAccountId: custAccount.CustomerAccountId,
+					AccountNumber:     custAccount.AccountNumber,
+					AccountAlias:      custAccount.AccountAlias,
+					Balance:           custAccount.Balance,
+					FrozenAmount:      custAccount.FrozenAmount,
+					BalanceBefore:     custAccount.BalanceBefore,
+					DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
+					Active:            custAccount.Active,
+				}
+				result = append(result, &account)
+			}
+			statusCode = "200"
+			statusDesc = "Customer account fetched successfully"
+		} else {
+			statusCode = "200"
+			statusDesc = "No customer accounts found"
+		}
 	}
+	resp := responses.CustomerAccountsResponse{
+		StatusCode:    statusCode,
+		StatusMessage: statusDesc,
+		Result:        result,
+	}
+	c.Data["json"] = resp
 	c.ServeJSON()
-}
 
-// Put ...
-// @Title Put
-// @Description update the Customer_accounts
-// @Param	id		path 	string	true		"The id you want to update"
-// @Param	body		body 	models.Customer_accounts	true		"body for Customer_accounts content"
-// @Success 200 {object} models.Customer_accounts
-// @Failure 403 :id is not int
-// @router /:id [put]
-func (c *Customer_accountsController) Put() {
-	idStr := c.Ctx.Input.Param(":id")
-	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := models.Customer_accounts{CustomerAccountId: id}
-	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
-	if err := models.UpdateCustomer_accountsById(&v); err == nil {
-		c.Data["json"] = "OK"
-	} else {
-		c.Data["json"] = err.Error()
-	}
-	c.ServeJSON()
 }
 
 // Delete ...

@@ -1,11 +1,10 @@
 package requests
 
 type CreateCustomerAccountRequest struct {
-	AccountNumber string  `json:"account_number" validate:"required"`
-	AccountAlias  string  `json:"account_alias" validate:"required"`
-	Balance       float64 `json:"balance" validate:"required,gte=0"`
-	CreatedBy     int     `json:"created_by" validate:"required"`
-	Active        int     `json:"active" validate:"required,oneof=0 1"`
+	AccountNumber string `json:"account_number" validate:"required"`
+	AccountAlias  string `json:"account_alias" validate:"required"`
+	CreatedBy     int    `json:"created_by" validate:"required"`
+	Active        int    `json:"active" validate:"required,oneof=0 1"`
 }
 
 type UpdateCustomerAccountRequest struct {
