@@ -95,17 +95,35 @@ func (c *Customer_accountsController) DebitAccount() {
 	v := requests.DebitAccountRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	if custAccount, err := models.GetCustomer_accountsById(id); err != nil {
+	statusCode := "500"
+	statusDesc := "Error debiting account"
+	result := responses.CustomerAccountResponseObj{}
+
+	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
 		currentBalance := custAccount.Balance
 		custAccount.BalanceBefore = currentBalance
 		custAccount.Balance = currentBalance - v.Amount
 		custAccount.DateModified = time.Now()
 		custAccount.ModifiedBy = v.ModifiedBy
 		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
-			resp := responses.CustomerAccountResponse{
-				StatusCode:    "200",
-				StatusMessage: "Account debited successfully",
-				Result: &responses.CustomerAccountResponseObj{
+			accountHistory := models.Customer_account_history{
+				CustomerAccount: custAccount,
+				DebitAmount:     v.Amount,
+				CreditAmount:    0,
+				DateCreated:     time.Now(),
+				DateModified:    time.Now(),
+				CreatedBy:       v.ModifiedBy,
+				ModifiedBy:      v.ModifiedBy,
+			}
+
+			if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
+				logs.Error("Error adding to account history: ", err)
+				statusCode = "500"
+				statusDesc = "Error debiting account: " + err.Error()
+			} else {
+				logs.Info("Account history added successfully: ", accountHistory)
+
+				result = responses.CustomerAccountResponseObj{
 					CustomerAccountId: custAccount.CustomerAccountId,
 					AccountNumber:     custAccount.AccountNumber,
 					AccountAlias:      custAccount.AccountAlias,
@@ -114,23 +132,28 @@ func (c *Customer_accountsController) DebitAccount() {
 					BalanceBefore:     custAccount.BalanceBefore,
 					DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
 					Active:            custAccount.Active,
-				},
+				}
 			}
-			c.Data["json"] = resp
-			c.Ctx.Output.SetStatus(200)
+
 		} else {
 			logs.Error("Error updating customer account: ", err)
-			var resp = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error updating customer account: " + err.Error(), Result: nil}
-			c.Ctx.Output.SetStatus(500)
-			c.Data["json"] = resp
+			statusCode = "500"
+			statusDesc = "Error updating customer account: " + err.Error()
 		}
 	} else {
 		logs.Error("Error fetching customer account: ", err)
-		var resp responses.CustomerAccountResponse = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error fetching customer account: " + err.Error(), Result: nil}
-		c.Ctx.Output.SetStatus(500)
-		c.Data["json"] = resp
-		return
+		statusCode = "500"
+		statusDesc = "Error fetching customer account: " + err.Error()
 	}
+	resp := responses.CustomerAccountResponse{
+		StatusCode:    statusCode,
+		StatusMessage: statusDesc,
+		Result:        &result,
+	}
+
+	c.Data["json"] = resp
+	c.Ctx.Output.SetStatus(200)
+
 	c.ServeJSON()
 }
 
@@ -145,20 +168,38 @@ func (c *Customer_accountsController) DebitAccount() {
 func (c *Customer_accountsController) CreditAccount() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := requests.CreditAccountRequest{}
+	v := requests.DebitAccountRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	if custAccount, err := models.GetCustomer_accountsById(id); err != nil {
+	statusCode := "500"
+	statusDesc := "Error crediting account"
+	result := responses.CustomerAccountResponseObj{}
+
+	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
 		currentBalance := custAccount.Balance
 		custAccount.BalanceBefore = currentBalance
 		custAccount.Balance = currentBalance + v.Amount
 		custAccount.DateModified = time.Now()
 		custAccount.ModifiedBy = v.ModifiedBy
 		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
-			resp := responses.CustomerAccountResponse{
-				StatusCode:    "200",
-				StatusMessage: "Account credited successfully",
-				Result: &responses.CustomerAccountResponseObj{
+			accountHistory := models.Customer_account_history{
+				CustomerAccount: custAccount,
+				DebitAmount:     v.Amount,
+				CreditAmount:    0,
+				DateCreated:     time.Now(),
+				DateModified:    time.Now(),
+				CreatedBy:       v.ModifiedBy,
+				ModifiedBy:      v.ModifiedBy,
+			}
+
+			if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
+				logs.Error("Error adding to account history: ", err)
+				statusCode = "500"
+				statusDesc = "Error crediting account: " + err.Error()
+			} else {
+				logs.Info("Account history added successfully: ", accountHistory)
+
+				result = responses.CustomerAccountResponseObj{
 					CustomerAccountId: custAccount.CustomerAccountId,
 					AccountNumber:     custAccount.AccountNumber,
 					AccountAlias:      custAccount.AccountAlias,
@@ -167,23 +208,28 @@ func (c *Customer_accountsController) CreditAccount() {
 					BalanceBefore:     custAccount.BalanceBefore,
 					DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
 					Active:            custAccount.Active,
-				},
+				}
 			}
-			c.Data["json"] = resp
-			c.Ctx.Output.SetStatus(200)
+
 		} else {
 			logs.Error("Error updating customer account: ", err)
-			var resp = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error updating customer account: " + err.Error(), Result: nil}
-			c.Ctx.Output.SetStatus(500)
-			c.Data["json"] = resp
+			statusCode = "500"
+			statusDesc = "Error updating customer account: " + err.Error()
 		}
 	} else {
 		logs.Error("Error fetching customer account: ", err)
-		var resp responses.CustomerAccountResponse = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error fetching customer account: " + err.Error(), Result: nil}
-		c.Ctx.Output.SetStatus(500)
-		c.Data["json"] = resp
-		return
+		statusCode = "500"
+		statusDesc = "Error fetching customer account: " + err.Error()
 	}
+	resp := responses.CustomerAccountResponse{
+		StatusCode:    statusCode,
+		StatusMessage: statusDesc,
+		Result:        &result,
+	}
+
+	c.Data["json"] = resp
+	c.Ctx.Output.SetStatus(200)
+
 	c.ServeJSON()
 }
 

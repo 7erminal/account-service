@@ -11,8 +11,8 @@ import (
 )
 
 type Customer_account_history struct {
-	CustomerAccountHistoryId int64 `orm:"auto"`
-	CustomerAccountId        int
+	CustomerAccountHistoryId int64              `orm:"auto"`
+	CustomerAccount          *Customer_accounts `orm:"rel(fk)"`
 	DebitAmount              float64
 	CreditAmount             float64
 	DateCreated              time.Time `orm:"type(datetime)"`
