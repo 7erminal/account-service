@@ -314,12 +314,16 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 		}
 	}
 
+	logs.Info("Query map to get customer accounts is ", query)
+
 	if custAccounts, err := models.GetAllCustomer_accounts(query, fields, sortby, order, offset, limit); err != nil {
 		logs.Error("Error fetching customer account: ", err)
 		statusCode = "500"
 		statusDesc = "Error fetching customer accounts: " + err.Error()
 	} else {
+		logs.Info("Customer accounts fetched are ", custAccounts)
 		if len(custAccounts) > 0 {
+			logs.Info("Number of customer accounts found is ", len(custAccounts))
 			for _, v := range custAccounts {
 				custAccount := v.(models.Customer_accounts)
 				account := responses.CustomerAccountResponseObj{
