@@ -22,5 +22,7 @@ func main() {
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
 	}
 	orm.Debug = true
+
+	orm.DebugLog = orm.NewLog(logs.NewLogger(10000))
 	beego.Run()
 }
