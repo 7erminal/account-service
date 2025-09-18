@@ -13,9 +13,9 @@ import (
 type Customers struct {
 	Accountid            *Accounts            `orm:"column(accountid);rel(fk)"`
 	Active               int                  `orm:"column(active);null"`
-	Branch               *Branches            `orm:"column(branch);rel(fk)"`
+	Branch               *Branches            `orm:"column(branch);rel(fk);null"`
 	CreatedBy            int                  `orm:"column(created_by);null"`
-	CustomerCategoryId   *CustomerCategories  `orm:"column(customer_category_id);rel(fk)"`
+	CustomerCategoryId   *CustomerCategories  `orm:"column(customer_category_id);rel(fk);null"`
 	Id                   int64                `orm:"column(customer_id);auto"`
 	CustomerNumber       string               `orm:"column(customer_number);size(255);null"`
 	DateCreated          time.Time            `orm:"column(date_created);type(datetime);null;auto_now_add"`
@@ -24,7 +24,7 @@ type Customers struct {
 	Email                string               `orm:"column(email);size(255);null"`
 	FullName             string               `orm:"column(full_name);size(255)"`
 	IdentificationNumber string               `orm:"column(identification_number);size(255);null"`
-	IdentificationTypeId *IdentificationTypes `orm:"column(identification_type_id);rel(fk)"`
+	IdentificationTypeId *IdentificationTypes `orm:"column(identification_type_id);rel(fk);null"`
 	ImagePath            string               `orm:"column(image_path);size(200);null"`
 	LastTxnDate          time.Time            `orm:"column(last_txn_date);type(datetime);null"`
 	Location             string               `orm:"column(location);size(255);null"`

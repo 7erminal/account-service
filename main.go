@@ -23,6 +23,6 @@ func main() {
 	}
 	orm.Debug = true
 
-	orm.DebugLog = orm.NewLog(logs.NewLogger(10000))
+	// orm.DebugLog = orm.NewLog(logs.NewLogger(10000))
 	beego.Run()
 }
