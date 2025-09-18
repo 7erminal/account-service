@@ -40,42 +40,51 @@ func (c *Customer_accountsController) AddCustomerAccount() {
 	var v requests.CreateCustomerAccountRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	customer := models.Customer_accounts{
-		AccountNumber: v.AccountNumber,
-		AccountAlias:  v.AccountAlias,
-		Balance:       0,
-		FrozenAmount:  0,
-		BalanceBefore: 0,
-		DateCreated:   time.Now(),
-		DateModified:  time.Now(),
-		CreatedBy:     v.CreatedBy,
-		ModifiedBy:    v.CreatedBy,
-		Active:        v.Active,
-	}
-	if _, err := models.AddCustomer_accounts(&customer); err == nil {
-		c.Ctx.Output.SetStatus(200)
-		customerObj := responses.CustomerAccountResponseObj{
-			CustomerAccountId: customer.CustomerAccountId,
-			AccountNumber:     customer.AccountNumber,
-			AccountAlias:      customer.AccountAlias,
-			Balance:           customer.Balance,
-			FrozenAmount:      customer.FrozenAmount,
-			BalanceBefore:     customer.BalanceBefore,
-			DateCreated:       customer.DateCreated.Format("2006-01-02 15:04:05"),
-			Active:            customer.Active,
-		}
-
-		resp := responses.CustomerAccountResponse{
-			StatusCode:    "200",
-			StatusMessage: "Customer account created successfully",
-			Result:        &customerObj,
-		}
-		c.Data["json"] = resp
-	} else {
-		logs.Error("Error adding customer account: ", err)
+	if customer, err := models.GetCustomersById(v.CustomerId); err != nil {
+		logs.Error("Error fetching customer: ", err)
 		var resp = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error creating customer account: " + err.Error(), Result: nil}
 		c.Ctx.Output.SetStatus(500)
 		c.Data["json"] = resp
+	} else {
+
+		customer := models.Customer_accounts{
+			AccountNumber: v.AccountNumber,
+			AccountAlias:  v.AccountAlias,
+			Customer:      customer,
+			Balance:       0,
+			FrozenAmount:  0,
+			BalanceBefore: 0,
+			DateCreated:   time.Now(),
+			DateModified:  time.Now(),
+			CreatedBy:     v.CreatedBy,
+			ModifiedBy:    v.CreatedBy,
+			Active:        v.Active,
+		}
+		if _, err := models.AddCustomer_accounts(&customer); err == nil {
+			c.Ctx.Output.SetStatus(200)
+			customerObj := responses.CustomerAccountResponseObj{
+				CustomerAccountId: customer.CustomerAccountId,
+				AccountNumber:     customer.AccountNumber,
+				AccountAlias:      customer.AccountAlias,
+				Balance:           customer.Balance,
+				FrozenAmount:      customer.FrozenAmount,
+				BalanceBefore:     customer.BalanceBefore,
+				DateCreated:       customer.DateCreated.Format("2006-01-02 15:04:05"),
+				Active:            customer.Active,
+			}
+
+			resp := responses.CustomerAccountResponse{
+				StatusCode:    "200",
+				StatusMessage: "Customer account created successfully",
+				Result:        &customerObj,
+			}
+			c.Data["json"] = resp
+		} else {
+			logs.Error("Error adding customer account: ", err)
+			var resp = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error creating customer account: " + err.Error(), Result: nil}
+			c.Ctx.Output.SetStatus(500)
+			c.Data["json"] = resp
+		}
 	}
 	c.ServeJSON()
 }
