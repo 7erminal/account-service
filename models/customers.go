@@ -11,7 +11,7 @@ import (
 )
 
 type Customers struct {
-	Accountid            *Accounts            `orm:"column(accountid);rel(fk)"`
+	Accountid            *Accounts            `orm:"column(accountid);rel(fk);null"`
 	Active               int                  `orm:"column(active);null"`
 	Branch               *Branches            `orm:"column(branch);rel(fk);null"`
 	CreatedBy            int                  `orm:"column(created_by);null"`
