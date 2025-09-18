@@ -418,6 +418,9 @@ definitions:
       created_by:
         type: integer
         format: int64
+      customer_id:
+        type: integer
+        format: int64
   requests.CreditAccountRequest:
     title: CreditAccountRequest
     type: object

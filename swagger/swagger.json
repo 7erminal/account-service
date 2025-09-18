@@ -580,6 +580,10 @@
                 "created_by": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "customer_id": {
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
