@@ -40,17 +40,19 @@ func (c *Customer_accountsController) AddCustomerAccount() {
 	var v requests.CreateCustomerAccountRequest
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
-	if customer, err := models.GetCustomersById(v.CustomerId); err != nil {
+	if customer_, err := models.GetCustomersById(v.CustomerId); err != nil {
 		logs.Error("Error fetching customer: ", err)
 		var resp = responses.CustomerAccountResponse{StatusCode: "500", StatusMessage: "Error creating customer account: " + err.Error(), Result: nil}
 		c.Ctx.Output.SetStatus(500)
 		c.Data["json"] = resp
 	} else {
 
+		customerJson, _ := json.Marshal(customer_)
+		logs.Info("Customer fetched is ", string(customerJson))
 		customer := models.Customer_accounts{
 			AccountNumber: v.AccountNumber,
 			AccountAlias:  v.AccountAlias,
-			Customer:      customer,
+			Customer:      customer_,
 			Balance:       0,
 			FrozenAmount:  0,
 			BalanceBefore: 0,
