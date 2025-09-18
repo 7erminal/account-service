@@ -4,6 +4,8 @@ type CustomerAccountResponseObj struct {
 	CustomerAccountId int64   `json:"customer_account_id"`
 	AccountNumber     string  `json:"account_number"`
 	AccountAlias      string  `json:"account_alias"`
+	AccountType       string  `json:"account_type,omitempty"`
+	Reference         string  `json:"reference,omitempty"`
 	Balance           float64 `json:"balance"`
 	FrozenAmount      float64 `json:"frozen_amount"`
 	BalanceBefore     float64 `json:"balance_before"`

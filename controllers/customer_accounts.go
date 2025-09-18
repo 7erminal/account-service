@@ -341,6 +341,8 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 					CustomerAccountId: custAccount.CustomerAccountId,
 					AccountNumber:     custAccount.AccountNumber,
 					AccountAlias:      custAccount.AccountAlias,
+					AccountType:       custAccount.AccountType,
+					Reference:         custAccount.Reference,
 					Balance:           custAccount.Balance,
 					FrozenAmount:      custAccount.FrozenAmount,
 					BalanceBefore:     custAccount.BalanceBefore,

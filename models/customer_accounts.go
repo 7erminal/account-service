@@ -16,6 +16,8 @@ type Customer_accounts struct {
 	Customer          *Customers `orm:"rel(fk);column(customer_id)"`
 	AccountNumber     string     `orm:"size(100)"`
 	AccountAlias      string     `orm:"size(255)"`
+	AccountType       string     `orm:"size(255);null"`
+	Reference         string     `orm:"size(100);null"`
 	Balance           float64
 	FrozenAmount      float64
 	BalanceBefore     float64
