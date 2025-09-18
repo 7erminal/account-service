@@ -15,8 +15,7 @@ func main() {
 		logs.Error("%s", err)
 	}
 
-	logs.SetLogger(logs.AdapterConsole) // Print logs to console for debugging
-	logs.SetLevel(logs.LevelDebug)      // Set log level to debug to see ORM queries
+	logs.SetLogger(logs.AdapterFile, `{"filename":"../logs/account_service.log"}`)
 	orm.RegisterDataBase("default", "mysql", sqlConn)
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
