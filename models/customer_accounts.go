@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 )
 
 type Customer_accounts struct {
 	CustomerAccountId int64      `orm:"auto"`
-	Customer          *Customers `orm:"rel(fk)"`
+	Customer          *Customers `orm:"rel(fk);column(customer_id)"`
 	AccountNumber     string     `orm:"size(100)"`
 	AccountAlias      string     `orm:"size(255)"`
 	Balance           float64
@@ -65,6 +66,8 @@ func GetAllCustomer_accounts(query map[string]string, fields []string, sortby []
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
 	qs := o.QueryTable(new(Customer_accounts))
+
+	logs.Info("Query map to get customer accounts is ", query)
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
@@ -109,6 +112,8 @@ func GetAllCustomer_accounts(query map[string]string, fields []string, sortby []
 			return nil, errors.New("Error: unused 'order' fields")
 		}
 	}
+
+	logs.Info("Query is ", qs)
 
 	var l []Customer_accounts
 	qs = qs.OrderBy(sortFields...).RelatedSel()
