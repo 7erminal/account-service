@@ -310,7 +310,7 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 	var limit int64 = 10
 	var offset int64
 
-	customerSearch := "Customer__Id:" + customerId
+	customerSearch := "Customer__customer_id:" + customerId
 
 	if v := customerSearch; v != "" {
 		for _, cond := range strings.Split(v, ",") {
