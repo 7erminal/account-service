@@ -116,6 +116,9 @@ func (c *Customer_accountsController) DebitAccount() {
 		custAccount.Balance = currentBalance - v.Amount
 		custAccount.DateModified = time.Now()
 		custAccount.ModifiedBy = v.ModifiedBy
+		logs.Info("Customer account before update is ", custAccount)
+		logs.Info("Current balance before debit is ", currentBalance)
+		logs.Info("New balance after debit will be ", custAccount.Balance)
 		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
 			accountHistory := models.Customer_account_history{
 				CustomerAccount: custAccount,
@@ -195,6 +198,10 @@ func (c *Customer_accountsController) CreditAccount() {
 		custAccount.Balance = currentBalance + v.Amount
 		custAccount.DateModified = time.Now()
 		custAccount.ModifiedBy = v.ModifiedBy
+
+		logs.Info("Customer account before update is ", custAccount)
+		logs.Info("Current balance before credit is ", currentBalance)
+		logs.Info("New balance after credit will be ", custAccount.Balance)
 		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
 			accountHistory := models.Customer_account_history{
 				CustomerAccount: custAccount,
