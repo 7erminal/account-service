@@ -21,6 +21,11 @@ func init() {
 				&controllers.Customer_accountsController{},
 			),
 		),
+		beego.NSNamespace("/customer-account-anomalies",
+			beego.NSInclude(
+				&controllers.Customer_account_anomaliesController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

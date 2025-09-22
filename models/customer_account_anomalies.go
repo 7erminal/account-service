@@ -10,69 +10,55 @@ import (
 	"github.com/beego/beego/v2/client/orm"
 )
 
-type Accounts struct {
-	AccountName string         `orm:"column(accountName);size(255)"`
-	AccountNo   int            `orm:"column(accountNo)"`
-	Branchid    *Corporateinfo `orm:"column(branchid);rel(fk)"`
-	Corpid      *Corporateinfo `orm:"column(corpid);rel(fk)"`
-	DateTime    time.Time      `orm:"column(date_time);type(timestamp);auto_now_add"`
-	Id          int            `orm:"column(id);auto"`
-	Mobile      string         `orm:"column(mobile);size(255)"`
-}
-
-func (t *Accounts) TableName() string {
-	return "accounts"
+type Customer_account_anomalies struct {
+	Id             int64              `orm:"auto"`
+	Account        *Customer_accounts `orm:"rel(fk);column(account_id)"`
+	Amount         float64
+	Desc           string `orm:"size(100)"`
+	Statement      string `orm:"size(255);null"`
+	Balance        float64
+	CheckedBalance float64
+	DateCreated    time.Time `orm:"type(datetime)"`
+	DateModified   time.Time `orm:"type(datetime)"`
+	CreatedBy      int
+	ModifiedBy     int
+	Active         int
 }
 
 func init() {
-	orm.RegisterModel(new(Accounts))
+	orm.RegisterModel(new(Customer_account_anomalies))
 }
 
-// AddAccounts insert a new Accounts into database and returns
+// AddCustomer_account_anomalies insert a new Customer_account_anomalies into database and returns
 // last inserted Id on success.
-func AddAccounts(m *Accounts) (id int64, err error) {
+func AddCustomer_account_anomalies(m *Customer_account_anomalies) (id int64, err error) {
 	o := orm.NewOrm()
 	id, err = o.Insert(m)
 	return
 }
 
-// GetAccountsById retrieves Accounts by Id. Returns error if
+// GetCustomer_account_anomaliesById retrieves Customer_account_anomalies by Id. Returns error if
 // Id doesn't exist
-func GetAccountsById(id int) (v *Accounts, err error) {
+func GetCustomer_account_anomaliesById(id int64) (v *Customer_account_anomalies, err error) {
 	o := orm.NewOrm()
-	v = &Accounts{Id: id}
-	if err = o.Read(v); err == nil {
+	v = &Customer_account_anomalies{Id: id}
+	if err = o.QueryTable(new(Customer_account_anomalies)).Filter("Id", id).RelatedSel().One(v); err == nil {
 		return v, nil
 	}
 	return nil, err
 }
 
-// GetAccountsById retrieves Accounts by Id. Returns error if
-// Id doesn't exist
-func GetAccountsByAccountNumber(accountNumber string) (v *Accounts, err error) {
-	o := orm.NewOrm()
-	v = &Accounts{}
-	if err = o.Read(v); err == nil {
-		return v, nil
-	}
-	return nil, err
-}
-
-// GetAllAccounts retrieves all Accounts matches certain condition. Returns empty list if
+// GetAllCustomer_account_anomalies retrieves all Customer_account_anomalies matches certain condition. Returns empty list if
 // no records exist
-func GetAllAccounts(query map[string]string, fields []string, sortby []string, order []string,
+func GetAllCustomer_account_anomalies(query map[string]string, fields []string, sortby []string, order []string,
 	offset int64, limit int64) (ml []interface{}, err error) {
 	o := orm.NewOrm()
-	qs := o.QueryTable(new(Accounts))
+	qs := o.QueryTable(new(Customer_account_anomalies))
 	// query k=v
 	for k, v := range query {
 		// rewrite dot-notation to Object__Attribute
 		k = strings.Replace(k, ".", "__", -1)
-		if strings.Contains(k, "isnull") {
-			qs = qs.Filter(k, (v == "true" || v == "1"))
-		} else {
-			qs = qs.Filter(k, v)
-		}
+		qs = qs.Filter(k, v)
 	}
 	// order by:
 	var sortFields []string
@@ -113,8 +99,8 @@ func GetAllAccounts(query map[string]string, fields []string, sortby []string, o
 		}
 	}
 
-	var l []Accounts
-	qs = qs.OrderBy(sortFields...)
+	var l []Customer_account_anomalies
+	qs = qs.OrderBy(sortFields...).RelatedSel()
 	if _, err = qs.Limit(limit, offset).All(&l, fields...); err == nil {
 		if len(fields) == 0 {
 			for _, v := range l {
@@ -136,11 +122,11 @@ func GetAllAccounts(query map[string]string, fields []string, sortby []string, o
 	return nil, err
 }
 
-// UpdateAccounts updates Accounts by Id and returns error if
+// UpdateCustomer_account_anomalies updates Customer_account_anomalies by Id and returns error if
 // the record to be updated doesn't exist
-func UpdateAccountsById(m *Accounts) (err error) {
+func UpdateCustomer_account_anomaliesById(m *Customer_account_anomalies) (err error) {
 	o := orm.NewOrm()
-	v := Accounts{Id: m.Id}
+	v := Customer_account_anomalies{Id: m.Id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
@@ -151,15 +137,15 @@ func UpdateAccountsById(m *Accounts) (err error) {
 	return
 }
 
-// DeleteAccounts deletes Accounts by Id and returns error if
+// DeleteCustomer_account_anomalies deletes Customer_account_anomalies by Id and returns error if
 // the record to be deleted doesn't exist
-func DeleteAccounts(id int) (err error) {
+func DeleteCustomer_account_anomalies(id int64) (err error) {
 	o := orm.NewOrm()
-	v := Accounts{Id: id}
+	v := Customer_account_anomalies{Id: id}
 	// ascertain id exists in the database
 	if err = o.Read(&v); err == nil {
 		var num int64
-		if num, err = o.Delete(&Accounts{Id: id}); err == nil {
+		if num, err = o.Delete(&Customer_account_anomalies{Id: id}); err == nil {
 			fmt.Println("Number of records deleted in database:", num)
 		}
 	}

@@ -7,6 +7,51 @@ import (
 
 func init() {
 
+    beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "Post",
+            Router: `/`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "GetAll",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "GetOne",
+            Router: `/:id`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "Put",
+            Router: `/:id`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "Delete",
+            Router: `/:id`,
+            AllowHTTPMethods: []string{"delete"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
     beego.GlobalControllerRouter["account_service/controllers:AccountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:AccountsController"],
         beego.ControllerComments{
             Method: "Post",
@@ -89,6 +134,51 @@ func init() {
             Params: nil})
 
     beego.GlobalControllerRouter["account_service/controllers:ApplicationPropertiesController"] = append(beego.GlobalControllerRouter["account_service/controllers:ApplicationPropertiesController"],
+        beego.ControllerComments{
+            Method: "Delete",
+            Router: `/:id`,
+            AllowHTTPMethods: []string{"delete"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "Post",
+            Router: `/`,
+            AllowHTTPMethods: []string{"post"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "GetAll",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "GetOne",
+            Router: `/:id`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"],
+        beego.ControllerComments{
+            Method: "Put",
+            Router: `/:id`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_account_anomaliesController"],
         beego.ControllerComments{
             Method: "Delete",
             Router: `/:id`,
