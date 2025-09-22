@@ -28,6 +28,7 @@ func (c *Customer_accountsController) URLMapping() {
 	c.Mapping("GetAccountByCustomerId", c.GetAccountsByCustomerId)
 	c.Mapping("Delete", c.Delete)
 	c.Mapping("AccountHistory", c.AccountHistory)
+	c.Mapping("UpdateBalance", c.UpdateBalance)
 }
 
 // AddCustomerAccount ...
@@ -124,6 +125,7 @@ func (c *Customer_accountsController) DebitAccount() {
 				CustomerAccount: custAccount,
 				DebitAmount:     v.Amount,
 				CreditAmount:    0,
+				Reason:          v.Reason,
 				DateCreated:     time.Now(),
 				DateModified:    time.Now(),
 				CreatedBy:       v.ModifiedBy,
@@ -207,6 +209,7 @@ func (c *Customer_accountsController) CreditAccount() {
 				CustomerAccount: custAccount,
 				DebitAmount:     v.Amount,
 				CreditAmount:    0,
+				Reason:          v.Reason,
 				DateCreated:     time.Now(),
 				DateModified:    time.Now(),
 				CreatedBy:       v.ModifiedBy,
@@ -243,6 +246,63 @@ func (c *Customer_accountsController) CreditAccount() {
 		logs.Error("Error fetching customer account: ", err)
 		statusCode = "500"
 		statusDesc = "Error fetching customer account: " + err.Error()
+	}
+	resp := responses.CustomerAccountResponse{
+		StatusCode:    statusCode,
+		StatusMessage: statusDesc,
+		Result:        &result,
+	}
+
+	c.Data["json"] = resp
+	c.Ctx.Output.SetStatus(200)
+
+	c.ServeJSON()
+}
+
+// UpdateBalance ...
+// @Title UpdateBalance
+// @Description update the Customer_accounts
+// @Param	id		path 	string	true		"The id you want to update"
+// @Param	body		body 	requests.UpdateBalanceRequest	true		"body for Customer_accounts content"
+// @Success 200 {object} models.Customer_accounts
+// @Failure 403 :id is not int
+// @router /update-balance/:id [put]
+func (c *Customer_accountsController) UpdateBalance() {
+	idStr := c.Ctx.Input.Param(":id")
+	id, _ := strconv.ParseInt(idStr, 0, 64)
+	v := requests.UpdateBalanceRequest{}
+	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
+
+	statusCode := "500"
+	statusDesc := "Error debiting account"
+	result := responses.CustomerAccountResponseObj{}
+
+	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
+		custAccount.BalanceBefore = custAccount.Balance
+		custAccount.Balance = v.Balance
+		custAccount.DateModified = time.Now()
+		custAccount.ModifiedBy = v.ModifiedBy
+
+		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
+			result = responses.CustomerAccountResponseObj{
+				CustomerAccountId: custAccount.CustomerAccountId,
+				AccountNumber:     custAccount.AccountNumber,
+				AccountAlias:      custAccount.AccountAlias,
+				Balance:           custAccount.Balance,
+				FrozenAmount:      custAccount.FrozenAmount,
+				BalanceBefore:     custAccount.BalanceBefore,
+				DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
+				Active:            custAccount.Active,
+			}
+
+		} else {
+			logs.Error("Error updating customer account: ", err)
+			statusCode = "500"
+			statusDesc = "Error updating customer account: " + err.Error()
+		}
+	} else {
+		logs.Error("Error fetching customer account: ", err)
+		statusCode = "500"
 	}
 	resp := responses.CustomerAccountResponse{
 		StatusCode:    statusCode,
@@ -463,6 +523,7 @@ func (c *Customer_accountsController) AccountHistory() {
 				DebitAmount:              accountHistModel.DebitAmount,
 				CreditAmount:             accountHistModel.CreditAmount,
 				TransactionDate:          accountHistModel.DateCreated.Format("2006-01-02 15:04:05"),
+				Reference:                accountHistModel.Reason,
 			}
 			accountHistory = append(accountHistory, &accountHistData)
 			//

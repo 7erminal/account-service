@@ -26,3 +26,9 @@ type CreditAccountRequest struct {
 	ModifiedBy int     `json:"modified_by" validate:"required"`
 	Reason     string  `json:"reason" validate:"omitempty"`
 }
+
+type UpdateBalanceRequest struct {
+	Balance    float64 `json:"amount" validate:"required,gt=0"`
+	ModifiedBy int     `json:"modified_by" validate:"required"`
+	Reason     string  `json:"reason" validate:"omitempty"`
+}

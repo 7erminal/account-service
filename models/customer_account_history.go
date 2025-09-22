@@ -15,6 +15,7 @@ type Customer_account_history struct {
 	CustomerAccount          *Customer_accounts `orm:"rel(fk)"`
 	DebitAmount              float64
 	CreditAmount             float64
+	Reason                   string    `orm:"null"`
 	DateCreated              time.Time `orm:"type(datetime)"`
 	DateModified             time.Time `orm:"type(datetime)"`
 	CreatedBy                int
