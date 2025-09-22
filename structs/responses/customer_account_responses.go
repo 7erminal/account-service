@@ -29,3 +29,19 @@ type CustomerAccountsResponse struct {
 	StatusMessage string                        `json:"statusMessage"`
 	Result        []*CustomerAccountResponseObj `json:"result,omitempty"`
 }
+
+type CustomerAccountHistoryData struct {
+	CustomerAccountHistoryId int64
+	CustomerAccount          string
+	DebitAmount              float64
+	CreditAmount             float64
+	TransactionDate          string
+	CreatedBy                int
+	ModifiedBy               int
+}
+
+type CustomerAccountHistoryResponse struct {
+	StatusCode    string                        `json:"statusCode"`
+	StatusMessage string                        `json:"statusMessage"`
+	Result        []*CustomerAccountHistoryData `json:"result,omitempty"`
+}
