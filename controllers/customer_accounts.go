@@ -134,6 +134,9 @@ func (c *Customer_accountsController) DebitAccount() {
 			} else {
 				logs.Info("Account history added successfully: ", accountHistory)
 
+				statusCode = "200"
+				statusDesc = "Customer account debited successfully"
+
 				result = responses.CustomerAccountResponseObj{
 					CustomerAccountId: custAccount.CustomerAccountId,
 					AccountNumber:     custAccount.AccountNumber,
@@ -209,6 +212,8 @@ func (c *Customer_accountsController) CreditAccount() {
 				statusDesc = "Error crediting account: " + err.Error()
 			} else {
 				logs.Info("Account history added successfully: ", accountHistory)
+				statusCode = "200"
+				statusDesc = "Customer account credited successfully"
 
 				result = responses.CustomerAccountResponseObj{
 					CustomerAccountId: custAccount.CustomerAccountId,
