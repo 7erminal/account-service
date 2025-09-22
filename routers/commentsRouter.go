@@ -198,6 +198,15 @@ func init() {
 
     beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"],
         beego.ControllerComments{
+            Method: "AccountHistory",
+            Router: `/account-history:accountNumber`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"],
+        beego.ControllerComments{
             Method: "GetAccountByAccountNumber",
             Router: `/account/:accountNumber`,
             AllowHTTPMethods: []string{"get"},
