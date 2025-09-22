@@ -20,7 +20,7 @@ func init() {
 // Run the migrations
 func (m *CustomerAccountAnomalies_20250921_144416) Up() {
 	// use m.SQL("CREATE TABLE ...") to make schema update
-	m.SQL("CREATE TABLE customer_account_anomalies(`id` int(11) NOT NULL AUTO_INCREMENT,`account_number` varchar(255) NOT NULL,`amount` float NOT NULL,`desc` varchar(100) NOT NULL,`balance` float NOT NULL,`checked_balance` float NOT NULL,`date_created` datetime NOT NULL,`date_modified` datetime NOT NULL,`created_by` int(11) DEFAULT NULL,`modified_by` int(11) DEFAULT NULL,`active` int(11) DEFAULT NULL,PRIMARY KEY (`id`))")
+	m.SQL("CREATE TABLE customer_account_anomalies(`customer_account_anomaly_id` int(11) NOT NULL AUTO_INCREMENT,`customer_account_id` int(11) NOT NULL,`amount` float DEFAULT 0.0,`desc` varchar(100) DEFAULT NULL,`statement` varchar(100) DEFAULT NULL,`balance` float DEFAULT 0.0,`checked_balance` float DEFAULT 0.0,`date_created` datetime DEFAULT CURRENT_TIMESTAMP,`date_modified` datetime ON UPDATE CURRENT_TIMESTAMP,`created_by` int(11) DEFAULT 1,`modified_by` int(11) DEFAULT 1,`active` int(11) DEFAULT 1,PRIMARY KEY (`customer_account_anomaly_id`), FOREIGN KEY (customer_account_id) REFERENCES customer_accounts(customer_account_id) ON UPDATE CASCADE ON DELETE NO ACTION)")
 }
 
 // Reverse the migrations
