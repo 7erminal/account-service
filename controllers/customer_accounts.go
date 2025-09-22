@@ -385,7 +385,7 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 // @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Customer_account_anomalies
 // @Failure 403 :accountNumber is empty
-// @router /account-history:accountNumber [get]
+// @router /account-history/:accountNumber [get]
 func (c *Customer_accountsController) AccountHistory() {
 	accountNumber := c.Ctx.Input.Param(":accountNumber")
 
