@@ -374,8 +374,8 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 
 }
 
-// GetAll ...
-// @Title Get All
+// AccountHistory ...
+// @Title Account History
 // @Description get Customer_account_anomalies
 // @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
 // @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
