@@ -58,6 +58,8 @@ func (c *Customer_accountsController) AddCustomerAccount() {
 			Balance:       0,
 			FrozenAmount:  0,
 			BalanceBefore: 0,
+			AccountType:   v.AccountType,
+			Reference:     v.Reference,
 			DateCreated:   time.Now(),
 			DateModified:  time.Now(),
 			CreatedBy:     v.CreatedBy,

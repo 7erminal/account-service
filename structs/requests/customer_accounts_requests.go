@@ -6,6 +6,8 @@ type CreateCustomerAccountRequest struct {
 	CreatedBy     int    `json:"created_by" validate:"required"`
 	Active        int    `json:"active" validate:"required,oneof=0 1"`
 	CustomerId    int64  `json:"customer_id" validate:"required"`
+	AccountType   string `json:"account_type" validate:"required,oneof=savings checking"`
+	Reference     string `json:"reference" validate:"omitempty"`
 }
 
 type UpdateCustomerAccountRequest struct {
