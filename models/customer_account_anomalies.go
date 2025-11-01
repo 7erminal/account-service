@@ -12,7 +12,7 @@ import (
 
 type Customer_account_anomalies struct {
 	Id             int64              `orm:"auto"`
-	Account        *Customer_accounts `orm:"rel(fk);column(account_id)"`
+	Account        *Customer_accounts `orm:"rel(fk);column(customer_account_id)"`
 	Amount         float64
 	Desc           string `orm:"size(100)"`
 	Statement      string `orm:"size(255);null"`
