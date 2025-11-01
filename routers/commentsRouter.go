@@ -250,4 +250,13 @@ func init() {
             Filters: nil,
             Params: nil})
 
+    beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"],
+        beego.ControllerComments{
+            Method: "UpdateBalance",
+            Router: `/update-balance/:id`,
+            AllowHTTPMethods: []string{"put"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
 }
