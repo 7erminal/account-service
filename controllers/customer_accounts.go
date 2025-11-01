@@ -275,6 +275,13 @@ func (c *Customer_accountsController) UpdateBalance() {
 	v := requests.UpdateBalanceRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	pretty, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		logs.Error("Failed to pretty-print request body: ", err)
+	} else {
+		logs.Info("Request body:\n", string(pretty))
+	}
+
 	statusCode := "500"
 	statusDesc := "Error debiting account"
 	result := responses.CustomerAccountResponseObj{}
