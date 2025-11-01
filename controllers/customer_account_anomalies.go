@@ -78,7 +78,7 @@ func (c *Customer_account_anomaliesController) Post() {
 			}
 
 			c.Ctx.Output.SetStatus(200)
-			c.Data["json"] = v
+			c.Data["json"] = response
 		} else {
 			// c.Data["json"] = err.Error()
 			logs.Error("Error creating account anomaly: ", err)
