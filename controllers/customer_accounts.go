@@ -297,6 +297,9 @@ func (c *Customer_accountsController) UpdateBalance() {
 				Active:            custAccount.Active,
 			}
 
+			statusCode = "200"
+			statusDesc = "Customer account balance updated successfully"
+
 		} else {
 			logs.Error("Error updating customer account: ", err)
 			statusCode = "500"
