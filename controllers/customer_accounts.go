@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"account_service/functions"
 	"account_service/models"
 	"account_service/structs/requests"
 	"account_service/structs/responses"
@@ -114,52 +115,59 @@ func (c *Customer_accountsController) DebitAccount() {
 	result := responses.CustomerAccountResponseObj{}
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
-		currentBalance := custAccount.Balance
-		custAccount.BalanceBefore = currentBalance
-		custAccount.Balance = currentBalance - v.Amount
-		custAccount.DateModified = time.Now()
-		custAccount.ModifiedBy = v.ModifiedBy
-		logs.Info("Customer account before update is ", custAccount)
-		logs.Info("Current balance before debit is ", currentBalance)
-		logs.Info("New balance after debit will be ", custAccount.Balance)
-		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
-			accountHistory := models.Customer_account_history{
-				CustomerAccount: custAccount,
-				DebitAmount:     v.Amount,
-				CreditAmount:    0,
-				Reason:          v.Reason,
-				DateCreated:     time.Now(),
-				DateModified:    time.Now(),
-				CreatedBy:       v.ModifiedBy,
-				ModifiedBy:      v.ModifiedBy,
-			}
-
-			if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
-				logs.Error("Error adding to account history: ", err)
-				statusCode = "500"
-				statusDesc = "Error debiting account: " + err.Error()
-			} else {
-				logs.Info("Account history added successfully: ", accountHistory)
-
-				statusCode = "200"
-				statusDesc = "Customer account debited successfully"
-
-				result = responses.CustomerAccountResponseObj{
-					CustomerAccountId: custAccount.CustomerAccountId,
-					AccountNumber:     custAccount.AccountNumber,
-					AccountAlias:      custAccount.AccountAlias,
-					Balance:           custAccount.Balance,
-					FrozenAmount:      custAccount.FrozenAmount,
-					BalanceBefore:     custAccount.BalanceBefore,
-					DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
-					Active:            custAccount.Active,
-				}
-			}
-
+		if status, message := functions.ValidateAmount(v.Amount, custAccount.Balance); !status {
+			logs.Error("Validation error: ", message)
+			statusCode = "400"
+			statusDesc = message
 		} else {
-			logs.Error("Error updating customer account: ", err)
-			statusCode = "500"
-			statusDesc = "Error updating customer account: " + err.Error()
+
+			currentBalance := custAccount.Balance
+			custAccount.BalanceBefore = currentBalance
+			custAccount.Balance = currentBalance - v.Amount
+			custAccount.DateModified = time.Now()
+			custAccount.ModifiedBy = v.ModifiedBy
+			logs.Info("Customer account before update is ", custAccount)
+			logs.Info("Current balance before debit is ", currentBalance)
+			logs.Info("New balance after debit will be ", custAccount.Balance)
+			if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
+				accountHistory := models.Customer_account_history{
+					CustomerAccount: custAccount,
+					DebitAmount:     v.Amount,
+					CreditAmount:    0,
+					Reason:          v.Reason,
+					DateCreated:     time.Now(),
+					DateModified:    time.Now(),
+					CreatedBy:       v.ModifiedBy,
+					ModifiedBy:      v.ModifiedBy,
+				}
+
+				if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
+					logs.Error("Error adding to account history: ", err)
+					statusCode = "500"
+					statusDesc = "Error debiting account: " + err.Error()
+				} else {
+					logs.Info("Account history added successfully: ", accountHistory)
+
+					statusCode = "200"
+					statusDesc = "Customer account debited successfully"
+
+					result = responses.CustomerAccountResponseObj{
+						CustomerAccountId: custAccount.CustomerAccountId,
+						AccountNumber:     custAccount.AccountNumber,
+						AccountAlias:      custAccount.AccountAlias,
+						Balance:           custAccount.Balance,
+						FrozenAmount:      custAccount.FrozenAmount,
+						BalanceBefore:     custAccount.BalanceBefore,
+						DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
+						Active:            custAccount.Active,
+					}
+				}
+
+			} else {
+				logs.Error("Error updating customer account: ", err)
+				statusCode = "500"
+				statusDesc = "Error updating customer account: " + err.Error()
+			}
 		}
 	} else {
 		logs.Error("Error fetching customer account: ", err)
