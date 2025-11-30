@@ -115,6 +115,7 @@ func (c *Customer_accountsController) DebitAccount() {
 	result := responses.CustomerAccountResponseObj{}
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
+		logs.Info("About to validate amount ", v.Amount, " against balance ", custAccount.Balance)
 		if status, message := functions.ValidateAmount(v.Amount, custAccount.Balance); !status {
 			logs.Error("Validation error: ", message)
 			statusCode = "400"
