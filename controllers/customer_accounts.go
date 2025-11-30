@@ -110,14 +110,18 @@ func (c *Customer_accountsController) DebitAccount() {
 	v := requests.DebitAccountRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	amount := c.Ctx.Input.Query("amount")
+	modifiedBy := c.Ctx.Input.Query("modified_by")
+	// reason := c.Ctx.Input.Query("reason")
+
 	statusCode := "500"
 	statusDesc := "Error debiting account"
 	result := responses.CustomerAccountResponseObj{}
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
-		logs.Info("About to validate amount ", v.Amount, " against balance ", custAccount.Balance)
-		amountFloat, _ := strconv.ParseFloat(v.Amount, 64)
-		modifiedByInt, _ := strconv.Atoi(v.ModifiedBy)
+		logs.Info("About to validate amount ", amount, " against balance ", custAccount.Balance)
+		amountFloat, _ := strconv.ParseFloat(amount, 64)
+		modifiedByInt, _ := strconv.Atoi(modifiedBy)
 		if status, message := functions.ValidateAmount(amountFloat, custAccount.Balance); !status {
 			logs.Error("Validation error: ", message)
 			statusCode = "400"
@@ -203,13 +207,17 @@ func (c *Customer_accountsController) CreditAccount() {
 	v := requests.CreditAccountRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
+	amount := c.Ctx.Input.Query("amount")
+	modifiedBy := c.Ctx.Input.Query("modified_by")
+	// reason := c.Ctx.Input.Query("reason")
+
 	statusCode := "500"
 	statusDesc := "Error crediting account"
 	result := responses.CustomerAccountResponseObj{}
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
-		amountFloat, _ := strconv.ParseFloat(v.Amount, 64)
-		modifiedByInt, _ := strconv.Atoi(v.ModifiedBy)
+		amountFloat, _ := strconv.ParseFloat(amount, 64)
+		modifiedByInt, _ := strconv.Atoi(modifiedBy)
 
 		currentBalance := custAccount.Balance
 		custAccount.BalanceBefore = currentBalance
