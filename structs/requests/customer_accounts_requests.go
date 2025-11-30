@@ -18,15 +18,15 @@ type UpdateCustomerAccountRequest struct {
 }
 
 type DebitAccountRequest struct {
-	Amount     float64 `json:"amount" validate:"required,gt=0"`
-	ModifiedBy int     `json:"modified_by" validate:"required"`
-	Reason     string  `json:"reason" validate:"omitempty"`
+	Amount     string `json:"amount" validate:"required,gt=0"`
+	ModifiedBy string `json:"modified_by" validate:"required"`
+	Reason     string `json:"reason" validate:"omitempty"`
 }
 
 type CreditAccountRequest struct {
-	Amount     float64 `json:"amount" validate:"required,gt=0"`
-	ModifiedBy int     `json:"modified_by" validate:"required"`
-	Reason     string  `json:"reason" validate:"omitempty"`
+	Amount     string `json:"amount" validate:"required,gt=0"`
+	ModifiedBy string `json:"modified_by" validate:"required"`
+	Reason     string `json:"reason" validate:"omitempty"`
 }
 
 type UpdateBalanceRequest struct {

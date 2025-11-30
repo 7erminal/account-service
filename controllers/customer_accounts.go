@@ -116,7 +116,9 @@ func (c *Customer_accountsController) DebitAccount() {
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
 		logs.Info("About to validate amount ", v.Amount, " against balance ", custAccount.Balance)
-		if status, message := functions.ValidateAmount(v.Amount, custAccount.Balance); !status {
+		amountFloat, _ := strconv.ParseFloat(v.Amount, 64)
+		modifiedByInt, _ := strconv.Atoi(v.ModifiedBy)
+		if status, message := functions.ValidateAmount(amountFloat, custAccount.Balance); !status {
 			logs.Error("Validation error: ", message)
 			statusCode = "400"
 			statusDesc = message
@@ -124,22 +126,22 @@ func (c *Customer_accountsController) DebitAccount() {
 
 			currentBalance := custAccount.Balance
 			custAccount.BalanceBefore = currentBalance
-			custAccount.Balance = currentBalance - v.Amount
+			custAccount.Balance = currentBalance - amountFloat
 			custAccount.DateModified = time.Now()
-			custAccount.ModifiedBy = v.ModifiedBy
+			custAccount.ModifiedBy = modifiedByInt
 			logs.Info("Customer account before update is ", custAccount)
 			logs.Info("Current balance before debit is ", currentBalance)
 			logs.Info("New balance after debit will be ", custAccount.Balance)
 			if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
 				accountHistory := models.Customer_account_history{
 					CustomerAccount: custAccount,
-					DebitAmount:     v.Amount,
+					DebitAmount:     amountFloat,
 					CreditAmount:    0,
 					Reason:          v.Reason,
 					DateCreated:     time.Now(),
 					DateModified:    time.Now(),
-					CreatedBy:       v.ModifiedBy,
-					ModifiedBy:      v.ModifiedBy,
+					CreatedBy:       modifiedByInt,
+					ModifiedBy:      modifiedByInt,
 				}
 
 				if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
@@ -198,7 +200,7 @@ func (c *Customer_accountsController) DebitAccount() {
 func (c *Customer_accountsController) CreditAccount() {
 	idStr := c.Ctx.Input.Param(":id")
 	id, _ := strconv.ParseInt(idStr, 0, 64)
-	v := requests.DebitAccountRequest{}
+	v := requests.CreditAccountRequest{}
 	json.Unmarshal(c.Ctx.Input.RequestBody, &v)
 
 	statusCode := "500"
@@ -206,11 +208,14 @@ func (c *Customer_accountsController) CreditAccount() {
 	result := responses.CustomerAccountResponseObj{}
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
+		amountFloat, _ := strconv.ParseFloat(v.Amount, 64)
+		modifiedByInt, _ := strconv.Atoi(v.ModifiedBy)
+
 		currentBalance := custAccount.Balance
 		custAccount.BalanceBefore = currentBalance
-		custAccount.Balance = currentBalance + v.Amount
+		custAccount.Balance = currentBalance + amountFloat
 		custAccount.DateModified = time.Now()
-		custAccount.ModifiedBy = v.ModifiedBy
+		custAccount.ModifiedBy = modifiedByInt
 
 		logs.Info("Customer account before update is ", custAccount)
 		logs.Info("Current balance before credit is ", currentBalance)
@@ -218,13 +223,13 @@ func (c *Customer_accountsController) CreditAccount() {
 		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
 			accountHistory := models.Customer_account_history{
 				CustomerAccount: custAccount,
-				DebitAmount:     v.Amount,
+				DebitAmount:     amountFloat,
 				CreditAmount:    0,
 				Reason:          v.Reason,
 				DateCreated:     time.Now(),
 				DateModified:    time.Now(),
-				CreatedBy:       v.ModifiedBy,
-				ModifiedBy:      v.ModifiedBy,
+				CreatedBy:       modifiedByInt,
+				ModifiedBy:      modifiedByInt,
 			}
 
 			if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
