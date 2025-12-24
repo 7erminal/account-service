@@ -404,7 +404,7 @@ func (c *Customer_accountsController) GetAccountByAccountNumber() {
 func (c *Customer_accountsController) GetAccountsByCustomerId() {
 	customerId := c.Ctx.Input.Param(":id")
 
-	logs.Info("Fetching accounts for customer id ", customerId)
+	logs.Info("Fetching accounts for customer id: ", customerId)
 
 	statusCode := "500"
 	statusDesc := "Error crediting account"
