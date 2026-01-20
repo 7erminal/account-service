@@ -28,9 +28,16 @@ jobs:
           GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
           SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
       run: |
-        sshpass -p "$SSH_PASSWORD" ssh -o StrictHostKeyChecking=no root@185.211.5.90 "
-          cd /usr/app/mobile-application/account-service/ && \
-          git stash && \
-          git pull https://$GIT_USERNAME:$GIT_PASSWORD@github.com/7erminal/account-service.git && \
-          pm2 restart account-service
-        "
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+
+        ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
+          set -e
+          cd /usr/app/mobile-application/account-service
+          git stash
+          git pull origin msysmobilizer
+          go build -o account-service
+          pm2 restart account-service || \
+          pm2 start account-service --name account-service
+        EOF
