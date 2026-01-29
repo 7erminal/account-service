@@ -217,56 +217,63 @@ func (c *Customer_accountsController) CreditAccount() {
 	result := responses.CustomerAccountResponseObj{}
 
 	if custAccount, err := models.GetCustomer_accountsById(id); err == nil {
+		logs.Info("About to validate amount ", amount, " against balance ", custAccount.Balance)
 		amountFloat, _ := strconv.ParseFloat(amount, 64)
 		modifiedByInt, _ := strconv.Atoi(modifiedBy)
-
-		currentBalance := custAccount.Balance
-		custAccount.BalanceBefore = currentBalance
-		custAccount.Balance = currentBalance + amountFloat
-		custAccount.DateModified = time.Now()
-		custAccount.ModifiedBy = modifiedByInt
-
-		logs.Info("Amount to credit is ", amountFloat)
-		logs.Info("Customer account before update is ", custAccount)
-		logs.Info("Current balance before credit is ", currentBalance)
-		logs.Info("New balance after credit will be ", custAccount.Balance)
-		if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
-			accountHistory := models.Customer_account_history{
-				CustomerAccount: custAccount,
-				DebitAmount:     amountFloat,
-				CreditAmount:    0,
-				Reason:          v.Reason,
-				DateCreated:     time.Now(),
-				DateModified:    time.Now(),
-				CreatedBy:       modifiedByInt,
-				ModifiedBy:      modifiedByInt,
-			}
-
-			if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
-				logs.Error("Error adding to account history: ", err)
-				statusCode = "500"
-				statusDesc = "Error crediting account: " + err.Error()
-			} else {
-				logs.Info("Account history added successfully: ", accountHistory)
-				statusCode = "200"
-				statusDesc = "Customer account credited successfully"
-
-				result = responses.CustomerAccountResponseObj{
-					CustomerAccountId: custAccount.CustomerAccountId,
-					AccountNumber:     custAccount.AccountNumber,
-					AccountAlias:      custAccount.AccountAlias,
-					Balance:           custAccount.Balance,
-					FrozenAmount:      custAccount.FrozenAmount,
-					BalanceBefore:     custAccount.BalanceBefore,
-					DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
-					Active:            custAccount.Active,
-				}
-			}
-
+		if status, message := functions.ValidateAmount(amountFloat, custAccount.Balance); !status {
+			logs.Error("Validation error: ", message)
+			statusCode = "400"
+			statusDesc = message
 		} else {
-			logs.Error("Error updating customer account: ", err)
-			statusCode = "500"
-			statusDesc = "Error updating customer account: " + err.Error()
+
+			currentBalance := custAccount.Balance
+			custAccount.BalanceBefore = currentBalance
+			custAccount.Balance = currentBalance + amountFloat
+			custAccount.DateModified = time.Now()
+			custAccount.ModifiedBy = modifiedByInt
+
+			logs.Info("Amount to credit is ", amountFloat)
+			logs.Info("Customer account before update is ", custAccount)
+			logs.Info("Current balance before credit is ", currentBalance)
+			logs.Info("New balance after credit will be ", custAccount.Balance)
+			if err := models.UpdateCustomer_accountsById(custAccount); err == nil {
+				accountHistory := models.Customer_account_history{
+					CustomerAccount: custAccount,
+					DebitAmount:     amountFloat,
+					CreditAmount:    0,
+					Reason:          v.Reason,
+					DateCreated:     time.Now(),
+					DateModified:    time.Now(),
+					CreatedBy:       modifiedByInt,
+					ModifiedBy:      modifiedByInt,
+				}
+
+				if _, err := models.AddCustomer_account_history(&accountHistory); err != nil {
+					logs.Error("Error adding to account history: ", err)
+					statusCode = "500"
+					statusDesc = "Error crediting account: " + err.Error()
+				} else {
+					logs.Info("Account history added successfully: ", accountHistory)
+					statusCode = "200"
+					statusDesc = "Customer account credited successfully"
+
+					result = responses.CustomerAccountResponseObj{
+						CustomerAccountId: custAccount.CustomerAccountId,
+						AccountNumber:     custAccount.AccountNumber,
+						AccountAlias:      custAccount.AccountAlias,
+						Balance:           custAccount.Balance,
+						FrozenAmount:      custAccount.FrozenAmount,
+						BalanceBefore:     custAccount.BalanceBefore,
+						DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
+						Active:            custAccount.Active,
+					}
+				}
+
+			} else {
+				logs.Error("Error updating customer account: ", err)
+				statusCode = "500"
+				statusDesc = "Error updating customer account: " + err.Error()
+			}
 		}
 	} else {
 		logs.Error("Error fetching customer account: ", err)
