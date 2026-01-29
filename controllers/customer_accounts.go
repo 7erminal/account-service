@@ -133,6 +133,7 @@ func (c *Customer_accountsController) DebitAccount() {
 			custAccount.Balance = currentBalance - amountFloat
 			custAccount.DateModified = time.Now()
 			custAccount.ModifiedBy = modifiedByInt
+			logs.Info("Amount to debit is ", amountFloat)
 			logs.Info("Customer account before update is ", custAccount)
 			logs.Info("Current balance before debit is ", currentBalance)
 			logs.Info("New balance after debit will be ", custAccount.Balance)
@@ -225,6 +226,7 @@ func (c *Customer_accountsController) CreditAccount() {
 		custAccount.DateModified = time.Now()
 		custAccount.ModifiedBy = modifiedByInt
 
+		logs.Info("Amount to credit is ", amountFloat)
 		logs.Info("Customer account before update is ", custAccount)
 		logs.Info("Current balance before credit is ", currentBalance)
 		logs.Info("New balance after credit will be ", custAccount.Balance)
