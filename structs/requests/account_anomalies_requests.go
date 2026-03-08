@@ -12,6 +12,7 @@ type AccountAnomaliesRequest struct {
 }
 
 type CustomerAccountAnomaliesRequest struct {
+	RequestId      string
 	AccountNumber  string
 	Amount         float64
 	Desc           string
