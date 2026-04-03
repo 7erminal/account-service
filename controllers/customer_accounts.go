@@ -382,6 +382,7 @@ func (c *Customer_accountsController) GetAccountByAccountNumber() {
 	} else {
 		result = responses.CustomerAccountResponseObj{
 			CustomerAccountId: v.CustomerAccountId,
+			CustomerName:      v.Customer.FullName,
 			AccountNumber:     v.AccountNumber,
 			AccountAlias:      v.AccountAlias,
 			Balance:           v.Balance,

@@ -2,6 +2,7 @@ package responses
 
 type CustomerAccountResponseObj struct {
 	CustomerAccountId int64   `json:"customer_account_id"`
+	CustomerName      string  `json:"customer_name"`
 	AccountNumber     string  `json:"account_number"`
 	AccountAlias      string  `json:"account_alias"`
 	AccountType       string  `json:"account_type,omitempty"`
