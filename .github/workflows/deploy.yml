@@ -16,27 +16,35 @@ jobs:
     environment: production
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.20'
 
-    - name: Build
+    - name: Build and Deploy
       env:
-          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
-          GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
-          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        chmod 700 ~/.ssh
+        
+        cat << 'KEYEOF' > ~/.ssh/id_ed25519
+        ${{ secrets.SSH_PRIVATE_KEY }}
+        KEYEOF
         chmod 600 ~/.ssh/id_ed25519
+        
+        ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-        ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
+        ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes -o ConnectTimeout=10 "$DEPLOY_USER@$DEPLOY_HOST" << 'EOF'
           set -e
           cd /usr/app/mobile-application/account-service
-          git stash
-          git pull origin msysmobilizer
+          git fetch origin msysmobilizer
+          git checkout -f msysmobilizer
+          git reset --hard origin/msysmobilizer
           go build -o account-service
           pm2 restart account-service || \
           pm2 start account-service --name account-service

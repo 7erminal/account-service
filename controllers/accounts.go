@@ -46,6 +46,34 @@ func (c *AccountsController) Post() {
 	c.ServeJSON()
 }
 
+// Post ...
+// @Title Post
+// @Description create Accounts
+// @Param	body		body 	requests.CreateAccountRequestDTO	true		"body for Accounts content"
+// @Success 201 {int} models.Accounts
+// @Failure 403 body is empty
+// @router / [post]
+// func (c *AccountsController) Post() {
+// 	var q requests.CreateAccountRequestDTO
+// 	json.Unmarshal(c.Ctx.Input.RequestBody, &q)
+
+// 	if us, err := models.GetUsersById(q.UserId); err == nil {
+// 		var v models.Accounts = models.Accounts{UserId: q.UserId, AccountNumber: us.PhoneNumber, Balance: 0, BalanceBefore: 0, DateCreated: time.Now(), DateModified: time.Now(), CreatedBy: 1, ModifiedBy: 1, Active: 1}
+// 		if _, err := models.AddAccounts(&v); err == nil {
+// 			resp := responses.AccountDTO{StatusCode: 200, Account: &v, StatusDesc: "Account Successfully Added"}
+// 			c.Ctx.Output.SetStatus(201)
+// 			c.Data["json"] = resp
+// 		} else {
+// 			resp := responses.AccountDTO{StatusCode: 302, Account: nil, StatusDesc: err.Error()}
+// 			c.Data["json"] = resp
+// 		}
+// 	} else {
+// 		resp := responses.AccountDTO{StatusCode: 301, Account: nil, StatusDesc: err.Error()}
+// 		c.Data["json"] = resp
+// 	}
+// 	c.ServeJSON()
+// }
+
 // GetOne ...
 // @Title Get One
 // @Description get Accounts by id

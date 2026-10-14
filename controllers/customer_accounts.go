@@ -407,15 +407,16 @@ func (c *Customer_accountsController) GetAccountByAccountNumber() {
 // GetAccountsByCustomerId ...
 // @Title Get Account with Customer Id
 // @Description get Customer_accounts by account number
-// @Param	id		path 	string	true		"The key for staticblock"
+// @Param	query	query	string	false	"Filter. e.g. col1:v1,col2:v2 ..."
+// @Param	fields	query	string	false	"Fields returned. e.g. col1,col2 ..."
+// @Param	sortby	query	string	false	"Sorted-by fields. e.g. col1,col2 ..."
+// @Param	order	query	string	false	"Order corresponding to each sortby field, if single value, apply to all sortby fields. e.g. desc,asc ..."
+// @Param	limit	query	string	false	"Limit the size of result set. Must be an integer"
+// @Param	offset	query	string	false	"Start position of result set. Must be an integer"
 // @Success 200 {object} models.Customer_accounts
 // @Failure 403 :id is empty
-// @router /customer/:id [get]
+// @router / [get]
 func (c *Customer_accountsController) GetAccountsByCustomerId() {
-	customerId := c.Ctx.Input.Param(":id")
-
-	logs.Info("Fetching accounts for customer id: ", customerId)
-
 	statusCode := "500"
 	statusDesc := "Error crediting account"
 	result := []*responses.CustomerAccountResponseObj{}
@@ -427,9 +428,30 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 	var limit int64 = 10
 	var offset int64
 
-	customerSearch := "Customer__CustomerId:" + customerId
+	// customerSearch := "Customer__CustomerId:" + customerId
 
-	if v := customerSearch; v != "" {
+	// fields: col1,col2,entity.col3
+	if v := c.GetString("fields"); v != "" {
+		fields = strings.Split(v, ",")
+	}
+	// limit: 10 (default is 10)
+	if v, err := c.GetInt64("limit"); err == nil {
+		limit = v
+	}
+	// offset: 0 (default is 0)
+	if v, err := c.GetInt64("offset"); err == nil {
+		offset = v
+	}
+	// sortby: col1,col2
+	if v := c.GetString("sortby"); v != "" {
+		sortby = strings.Split(v, ",")
+	}
+	// order: desc,asc
+	if v := c.GetString("order"); v != "" {
+		order = strings.Split(v, ",")
+	}
+	// query: k:v,k:v
+	if v := c.GetString("query"); v != "" {
 		for _, cond := range strings.Split(v, ",") {
 			kv := strings.SplitN(cond, ":", 2)
 			if len(kv) != 2 {
