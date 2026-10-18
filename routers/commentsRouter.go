@@ -189,6 +189,15 @@ func init() {
 
     beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"],
         beego.ControllerComments{
+            Method: "GetAccountsByCustomerId",
+            Router: `/`,
+            AllowHTTPMethods: []string{"get"},
+            MethodParams: param.Make(),
+            Filters: nil,
+            Params: nil})
+
+    beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"],
+        beego.ControllerComments{
             Method: "Delete",
             Router: `/:id`,
             AllowHTTPMethods: []string{"delete"},
@@ -228,15 +237,6 @@ func init() {
             Method: "CreditAccount",
             Router: `/credit-account/:id`,
             AllowHTTPMethods: []string{"put"},
-            MethodParams: param.Make(),
-            Filters: nil,
-            Params: nil})
-
-    beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"] = append(beego.GlobalControllerRouter["account_service/controllers:Customer_accountsController"],
-        beego.ControllerComments{
-            Method: "GetAccountsByCustomerId",
-            Router: `/customer/:id`,
-            AllowHTTPMethods: []string{"get"},
             MethodParams: param.Make(),
             Filters: nil,
             Params: nil})
