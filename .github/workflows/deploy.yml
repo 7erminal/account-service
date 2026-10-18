@@ -26,24 +26,22 @@ jobs:
 
     - name: Build and Deploy
       env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+          GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
       run: |
         mkdir -p ~/.ssh
-        chmod 700 ~/.ssh
-        
-        cat << 'KEYEOF' > ~/.ssh/id_ed25519
-        ${{ secrets.SSH_PRIVATE_KEY }}
-        KEYEOF
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        
-        ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
 
-        ssh -i ~/.ssh/id_ed25519 -o BatchMode=yes -o ConnectTimeout=10 "$DEPLOY_USER@$DEPLOY_HOST" << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@185.211.5.90 << 'EOF'
           set -e
           cd /usr/app/mobile-application/account-service
+          git merge --abort 2>/dev/null || true
+          git rebase --abort 2>/dev/null || true
+          git stash
           git fetch origin msysmobilizer
-          git checkout -f msysmobilizer
+          git clean -fd
           git reset --hard origin/msysmobilizer
           go build -o account-service
           pm2 restart account-service || \
