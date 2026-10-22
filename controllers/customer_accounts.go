@@ -419,7 +419,7 @@ func (c *Customer_accountsController) GetAccountByAccountNumber() {
 func (c *Customer_accountsController) GetAccountsByCustomerId() {
 	statusCode := "500"
 	statusDesc := "Error crediting account"
-	result := []*responses.CustomerAccountResponseObj{}
+	result := []responses.CustomerAccountResponseObj{}
 
 	var fields []string
 	var sortby []string
@@ -488,7 +488,7 @@ func (c *Customer_accountsController) GetAccountsByCustomerId() {
 					DateCreated:       custAccount.DateCreated.Format("2006-01-02 15:04:05"),
 					Active:            custAccount.Active,
 				}
-				result = append(result, &account)
+				result = append(result, account)
 			}
 			statusCode = "200"
 			statusDesc = "Customer account fetched successfully"

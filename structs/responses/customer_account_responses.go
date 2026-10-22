@@ -26,9 +26,9 @@ type CustomerAccountResponse struct {
 }
 
 type CustomerAccountsResponse struct {
-	StatusCode    string                        `json:"statusCode"`
-	StatusMessage string                        `json:"statusMessage"`
-	Result        []*CustomerAccountResponseObj `json:"result,omitempty"`
+	StatusCode    string                       `json:"statusCode"`
+	StatusMessage string                       `json:"statusMessage"`
+	Result        []CustomerAccountResponseObj `json:"result,omitempty"`
 }
 
 type CustomerAccountHistoryData struct {
